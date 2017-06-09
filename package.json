@@ -2,7 +2,7 @@
   "name": "thinglator-interface-openzwave",
   "license": "MIT",
   "description": "An interface that allows Thinglator to talk to zwave devices using openzwave",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "maintainers": [
     {
       "name": "Richard Willars",
