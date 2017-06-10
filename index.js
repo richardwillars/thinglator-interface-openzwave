@@ -81,7 +81,12 @@ const openzwaveInterface = class OpenZWaveInterface {
         });
 
         this.zwave.on('node event', (nodeid, nodeEvt) => {
-            console.log('node event', nodeid, nodeEvt);
+            if (this.config.debug === true) {
+                console.log('node event', nodeid, nodeEvt);
+            }
+            if (this.nodes[nodeid].driverid !== null) {
+                this.onValueChanged(this.nodes[nodeid].driverid, nodeid, 0, 0, nodeEvt);
+            }
         });
 
         this.zwave.on('value changed', (nodeid, comclass, value) => {
