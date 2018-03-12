@@ -88,6 +88,35 @@ const setValue = async (nodeId, classId, instanceId, index, value, zwave) => {
   );
 };
 
+const pairingMode = zwave =>
+  new Promise(resolve => {
+    let hasResolved = false;
+    let timer = null;
+    zwave.on("controller command", (nodeId, ctrlState) => {
+      if (nodeId === 0 && (ctrlState === 2 || ctrlState === 7)) {
+        zwave.removeAllListeners("controller command");
+        if (hasResolved === false) {
+          hasResolved = true;
+          clearTimeout(timer);
+          if (ctrlState === 7) {
+            resolve(1);
+          } else {
+            resolve(0);
+          }
+        }
+      }
+      timer = setTimeout(() => {
+        zwave.cancelControllerCommand();
+        zwave.removeAllListeners("controller command");
+        if (hasResolved === false) {
+          hasResolved = true;
+          resolve(0);
+        }
+      }, 60000);
+    });
+    zwave.addNode(false);
+  });
+
 module.exports = async (config, ZWave, commsInterface) => {
   const zwave = new ZWave({
     ConsoleOutput: config.debug || false,
@@ -98,6 +127,7 @@ module.exports = async (config, ZWave, commsInterface) => {
   return {
     connect: async () => connect(zwave, config, commsInterface),
     disconnect: async () => disconnect(zwave, config),
+    pairingMode: async () => pairingMode(zwave),
     setConfig: async (nodeId, instanceId, index, value) =>
       setConfig(nodeId, instanceId, index, value, zwave),
     setValue: async (nodeId, classId, instanceId, index, value) =>

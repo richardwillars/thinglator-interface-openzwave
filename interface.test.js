@@ -23,6 +23,7 @@ describe("interface structure", () => {
       expect(Object.keys(interfaceObj)).toEqual([
         "connect",
         "disconnect",
+        "pairingMode",
         "setConfig",
         "setValue"
       ]);
@@ -277,6 +278,92 @@ describe("interface structure", () => {
           },
           value
         );
+      });
+    });
+
+    describe("pairingMode", () => {
+      it("should enter pairing mode when the method is called, and resolve with the number of added devices once completed", async () => {
+        const onSpy = jest.fn();
+        const addNodeSpy = jest.fn();
+        const removeAllListenersSpy = jest.fn();
+
+        const config = {
+          hardwareLocation: "/foo"
+        };
+        class ZWave {
+          on(arg1, arg2) {
+            onSpy(arg1, arg2);
+          }
+          connect() {}
+          addNode() {
+            addNodeSpy();
+          }
+          removeAllListeners(arg1) {
+            removeAllListenersSpy(arg1);
+          }
+        }
+        const commsInterface = {};
+
+        const interfaceObj = await interfaceModule(
+          config,
+          ZWave,
+          commsInterface
+        );
+        const pairingPromise = interfaceObj.pairingMode();
+        expect(addNodeSpy).toHaveBeenCalledTimes(1);
+
+        const callback = onSpy.mock.calls[0][1];
+        callback(0, 3);
+        expect(removeAllListenersSpy).toHaveBeenCalledTimes(0);
+        callback(0, 7);
+        expect(removeAllListenersSpy).toHaveBeenCalledTimes(1);
+        expect(removeAllListenersSpy).toHaveBeenCalledWith(
+          "controller command"
+        );
+        const deviceCount = await pairingPromise;
+        expect(deviceCount).toEqual(1);
+      });
+
+      it("should resolve with 0 devices found when pairing mode is cancelled", async () => {
+        const onSpy = jest.fn();
+        const addNodeSpy = jest.fn();
+        const removeAllListenersSpy = jest.fn();
+
+        const config = {
+          hardwareLocation: "/foo"
+        };
+        class ZWave {
+          on(arg1, arg2) {
+            onSpy(arg1, arg2);
+          }
+          connect() {}
+          addNode() {
+            addNodeSpy();
+          }
+          removeAllListeners(arg1) {
+            removeAllListenersSpy(arg1);
+          }
+        }
+        const commsInterface = {};
+
+        const interfaceObj = await interfaceModule(
+          config,
+          ZWave,
+          commsInterface
+        );
+        const pairingPromise = interfaceObj.pairingMode();
+        expect(addNodeSpy).toHaveBeenCalledTimes(1);
+
+        const callback = onSpy.mock.calls[0][1];
+        callback(0, 3);
+        expect(removeAllListenersSpy).toHaveBeenCalledTimes(0);
+        callback(0, 2);
+        expect(removeAllListenersSpy).toHaveBeenCalledTimes(1);
+        expect(removeAllListenersSpy).toHaveBeenCalledWith(
+          "controller command"
+        );
+        const deviceCount = await pairingPromise;
+        expect(deviceCount).toEqual(0);
       });
     });
   });
