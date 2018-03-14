@@ -14,6 +14,7 @@ An interface that allows Thinglator to talk to zwave devices using openzwave
 Navigate to the root of your Thinglator installation and run:
 
 > yarn add thinglator-interface-openzwave
+
 > yarn dev
 
 # Installation for development
@@ -21,6 +22,7 @@ Navigate to the root of your Thinglator installation and run:
 Navigate to the root of the thinglator-interface-openzwave project and run:
 
 > yarn install
+
 > yarn link
 
 Navigate to the root of your Thinglator installation and run:
