@@ -282,7 +282,8 @@ describe("interface structure", () => {
     });
 
     describe("pairingMode", () => {
-      it("should enter pairing mode when the method is called, and resolve with the number of added devices once completed", async () => {
+      it(`should enter pairing mode when the method is called, and resolve with the number of 
+      added devices once completed`, async () => {
         const onSpy = jest.fn();
         const addNodeSpy = jest.fn();
         const removeAllListenersSpy = jest.fn();
